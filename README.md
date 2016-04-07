@@ -11,8 +11,6 @@ Include the following files in your project:
 	Array2D.swift
 	TMXParser.swift
 
-These files are stored in the TMXParser folder.
-
 Then create an instance of TMXParser:
 
 	let parser = TMXParser(filename: "level.tmx")
