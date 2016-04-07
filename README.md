@@ -53,9 +53,11 @@ The current version of TMXParser has the following limitations:
 
 * iOS 7 and later only (requires Swift that can only compile to iOS 7 and above)
 * OS X not supported in current version
+* Only orthogonal maps in CSV format supported
 * External tilesets not supported in current version
 * Terrain is not supported in current version
-* Does not support flipped tiles (will be added soon)
+* Image layers not supported
+* Some properties for different objects do not exist. Easy to add.
 
 Some of these missing features will likely be added later but as I have no need for these features in my current projects I have no plan to eliminate these limitations in the near future.
 
