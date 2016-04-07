@@ -63,6 +63,6 @@ Some of these missing features will likely be added later but as I have no need 
 
 I would like to acknowledge the work of the following people who made it a whole lot simpler to make a TMX parser for Sprite Kit and Swift.
 
-* **Steffen Itterheim** (KoboldKit, [https://github.com/KoboldKit]())
-* **Jeremy Stone** (JSTileMap, [https://github.com/slycrel/JSTileMap]())
-* **The Cocos2D community** (Cocos2D-SpriteBuilder, [https://github.com/cocos2d/cocos2d-spritebuilder]())
+* **Steffen Itterheim** (KoboldKit, [https://github.com/KoboldKit](https://github.com/KoboldKit))
+* **Jeremy Stone** (JSTileMap, [https://github.com/slycrel/JSTileMap](https://github.com/slycrel/JSTileMap))
+* **The Cocos2D community** (Cocos2D-SpriteBuilder, [https://github.com/cocos2d/cocos2d-spritebuilder](https://github.com/cocos2d/cocos2d-spritebuilder))
