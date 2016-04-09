@@ -38,6 +38,8 @@ If you want to create the tiles for a map, it can be done like so:
           			let tileNode = SKSpriteNode(texture: atlas.textureNamed("\(tile.gID)"))
           			tileNode.position = tile.position
           			tileNode.zPosition = CGFloat(row)
+          			tileNode.xScale = tile.flippedHorizontally ? -1.0 : 1.0
+          			tileNode.yScale = tile.flippedVertically ? -1.0 : 1.0
           
           			// Add the tileNode to the chunk node
           			node.addChild(tileNode)
