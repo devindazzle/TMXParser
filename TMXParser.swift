@@ -31,9 +31,9 @@ class TMXParser: NSObject {
   
   // MARK: TileFlipped flag enum
   private struct TMXTileFlags {
-    static let FlipDiagonallyFlag: UInt32     = 0b00100000000000000000000000000000  // 0x20000000  // 00100000000000000000000000000000
-    static let FlipVerticallyFlag: UInt32     = 0b01000000000000000000000000000000  // 0x40000000  // 01000000000000000000000000000000
-    static let FlipHorizontallyFlag: UInt32   = 0b10000000000000000000000000000000  // 0x80000000  // 10000000000000000000000000000000
+    static let FlipDiagonallyFlag: UInt32     = 0b00100000000000000000000000000000
+    static let FlipVerticallyFlag: UInt32     = 0b01000000000000000000000000000000
+    static let FlipHorizontallyFlag: UInt32   = 0b10000000000000000000000000000000
     static let FlipAll: UInt32                = FlipHorizontallyFlag | FlipVerticallyFlag | FlipDiagonallyFlag
     static let FlipMask: UInt32               = ~FlipAll
   }
