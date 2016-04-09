@@ -1,4 +1,4 @@
-import SpriteKit
+import UIKit
 
 //
 //  Created by Kim Pedersen on 27/10/2015.
@@ -28,6 +28,15 @@ import SpriteKit
 //
 
 class TMXParser: NSObject {
+  
+  // MARK: TileFlipped flag enum
+  private struct TMXTileFlags {
+    static let FlipDiagonallyFlag: UInt32     = 0b00100000000000000000000000000000  // 0x20000000  // 00100000000000000000000000000000
+    static let FlipVerticallyFlag: UInt32     = 0b01000000000000000000000000000000  // 0x40000000  // 01000000000000000000000000000000
+    static let FlipHorizontallyFlag: UInt32   = 0b10000000000000000000000000000000  // 0x80000000  // 10000000000000000000000000000000
+    static let FlipAll: UInt32                = FlipHorizontallyFlag | FlipVerticallyFlag | FlipDiagonallyFlag
+    static let FlipMask: UInt32               = ~FlipAll
+  }
   
   // MARK: Properties
   
@@ -212,9 +221,18 @@ class TMXParser: NSObject {
     // Copy the data into the layer
     for i in 0..<gIDArray.count {
       
-      // Calculate the position of the tile
-      let gID = gIDArray[i].stringByReplacingOccurrencesOfString("\n", withString: "")
+      // Get the gID of the tile - including flip flags
+      guard var gID = UInt32(gIDArray[i].stringByReplacingOccurrencesOfString("\n", withString: "")) else {
+        fatalError("Invalid gID detected!")
+      }
       
+      // Get flip flags from gID
+      let flags = gID & TMXTileFlags.FlipAll
+      
+      // Remove the flip flags from the gID
+      gID &= TMXTileFlags.FlipMask
+      
+      // Calculate the position of the tile
       let col = i % width
       let row = i / width
       
@@ -229,11 +247,16 @@ class TMXParser: NSObject {
       // Create a tile
       let tile = TMXTile(layer: layer)
       
-      tile.gID = Int(gID)!
+      tile.gID = Int(gID)
       tile.column = col
       tile.row = row
       tile.position = rect.center()
       tile.rect = rect
+      
+      // Tile flipping
+      tile.flippedHorizontally = flags & TMXTileFlags.FlipHorizontallyFlag != 0
+      tile.flippedVertically   = flags & TMXTileFlags.FlipVerticallyFlag != 0
+      tile.flippedDiagonally   = flags & TMXTileFlags.FlipDiagonallyFlag != 0
       
       // Add the tile to the layer
       layer.tiles[col, row] = tile
@@ -576,6 +599,15 @@ class TMXTile {
   
   /// The position for this tile
   var position = CGPointZero
+  
+  /// Is this tile flipped horizontally
+  var flippedHorizontally = false
+  
+  /// Is this tile flipped vertically
+  var flippedVertically = false
+  
+  /// Is this tile flipped diagonally
+  var flippedDiagonally = false
   
   /// Initializer
   init(layer: TMXTileLayer) {
