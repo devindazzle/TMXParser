@@ -319,16 +319,15 @@ class TMXParser: NSObject {
     // The position of the object - the y-coordinate is reversed as OpenGL ES has origin in bottom left corner (and not top left as Tiled uses)
     if let x = attributeDict["x"], y = attributeDict["y"] {
       object.position = CGPoint(
-        x: CGFloat(Int(x)!) + object.size.width * 0.5,
-        y: size.height - (CGFloat(Int(y)!) + object.size.height * 0.5)
+        x: CGFloat(Int(x)!),
+        y: size.height - CGFloat(Int(y)!)
       )
+      object.position.y += object.size.height * 0.5
     }
     
     // A reference to a tile gID
     if let gID = attributeDict["gid"] {
       object.gID = Int(gID)!
-      object.size = CGSize(width: tileWidth, height: tileHeight)
-      object.position.y += CGFloat(tileHeight) // TODO: FIX HACK!!!
       object.objectType = .Tile
     }
     
