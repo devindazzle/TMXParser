@@ -338,7 +338,7 @@ class TMXParser: NSObject {
     
     // The visibility
     if let visible = attributeDict["visible"] {
-      if visible == "false" {
+      if visible == "0" {
         object.visible = false
       }
     }
