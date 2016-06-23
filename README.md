@@ -1,4 +1,4 @@
-# TMXParser is a TMX parser for SpriteKit written in Swift. It supports Swift 2.0 and up.
+# TMXParser is a TMX parser written in Swift. It supports Swift 2.0 and up.
 
 TMXParser will parse TMX files created with [Tiled Map Editor](http://www.mapeditor.org/) so that you will be able to easily create the tiles and objects for your game. 
 
