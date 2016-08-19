@@ -26,25 +26,25 @@
 //
 
 struct Array2D<T> {
-  
-  // The number of columns and rows
-  let columns: Int, rows: Int
-  
-  private var array: Array<T?>
-  
-  init(columns: Int, rows: Int) {
-    self.columns = columns
-    self.rows = rows
-    array = Array<T?>(count: rows * columns, repeatedValue: nil)
-  }
-  
-  subscript(column: Int, row: Int) -> T? {
-    get {
-      return array[row * columns + column]
+    
+    // The number of columns and rows
+    let columns: Int, rows: Int
+    
+    private var array: Array<T?>
+    
+    init(columns: Int, rows: Int) {
+        self.columns = columns
+        self.rows = rows
+        array = [T?](repeating: nil, count: rows * columns)
     }
-    set {
-      array[row * columns + column] = newValue
+    
+    subscript(column: Int, row: Int) -> T? {
+        get {
+            return array[row * columns + column]
+        }
+        set {
+            array[row * columns + column] = newValue
+        }
     }
-  }
-  
+    
 }
