@@ -1,5 +1,5 @@
 //
-//  Created by Kim Pedersen on 27/10/2015.
+//  Created by Kim Pedersen on 15/10/2017.
 //  Copyright © 2015 twoFly. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
