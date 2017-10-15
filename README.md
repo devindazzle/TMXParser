@@ -1,4 +1,4 @@
-# TMXParser is a TMX parser written in Swift. It supports Swift 3.0.
+# TMXParser is a TMX parser written in Swift. It supports Swift 4.0.
 
 TMXParser will parse TMX files created with [Tiled Map Editor](http://www.mapeditor.org/) so that you will be able to easily create the tiles and objects for your game. 
 
@@ -58,7 +58,6 @@ The current version of TMXParser has the following limitations:
 * Only orthogonal maps in CSV format supported
 * External tilesets not supported in current version
 * Terrain is not supported in current version
-* Image layers not supported
 * Some properties for different objects do not exist. Easy to add.
 
 Some of these missing features will likely be added later but as I have no need for these features in my current projects I have no plan to eliminate these limitations in the near future.
