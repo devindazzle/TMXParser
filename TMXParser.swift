@@ -1,7 +1,7 @@
 import UIKit
 
 //
-//  Created by Kim Pedersen on 27/10/2015.
+//  Created by Kim Pedersen on 15/10/2017.
 //  Copyright © 2015 twoFly. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -61,6 +61,9 @@ class TMXParser: NSObject {
     var size: CGSize {
         return CGSize(width: width * tileWidth, height: height * tileHeight)
     }
+    
+    /// Background color
+    var backgroundColor: UIColor = UIColor.clear
     
     /// Map properties
     lazy var properties = [String : String]()
@@ -183,6 +186,29 @@ class TMXParser: NSObject {
         
         if let tileHeight = attributeDict["tileheight"] {
             self.tileHeight = Int(tileHeight)!
+        }
+        
+        // Get the background color
+        if let hexString = attributeDict["backgroundcolor"], hexString.hasPrefix("#") {
+            let start = hexString.index(hexString.startIndex, offsetBy: 1)
+            let hexColor = String(hexString[start...])
+            let scanner = Scanner(string: hexColor)
+            var hexNumber: UInt32 = 0
+            
+            if scanner.scanHexInt32(&hexNumber) {
+                if hexColor.count == 8 {
+                    let a = CGFloat((hexNumber & 0xff000000) >> 24) / 255
+                    let r = CGFloat((hexNumber & 0x00ff0000) >> 16) / 255
+                    let g = CGFloat((hexNumber & 0x0000ff00) >> 8 ) / 255
+                    let b = CGFloat( hexNumber & 0x000000ff)        / 255
+                    backgroundColor = UIColor(red: r, green: g, blue: b, alpha: a)
+                } else if hexColor.count == 6 {
+                    let r = CGFloat((hexNumber & 0xff0000) >> 16) / 255
+                    let g = CGFloat((hexNumber & 0x00ff00) >> 8)  / 255
+                    let b = CGFloat( hexNumber & 0x0000ff)        / 255
+                    backgroundColor = UIColor(red: r, green: g, blue: b, alpha: 1)
+                }
+            }
         }
         
     }
