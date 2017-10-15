@@ -14,7 +14,7 @@ import UIKit
 //    documentation and/or other materials provided with the distribution.
 // 3. The name of the author may not be used to endorse or promote products
 //    derived from this software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
 // OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -25,16 +25,6 @@ import UIKit
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-
-import UIKit
-
-//
-//  TMXParser.swift
-//  Bump
-//
-//  Created by Kim Pedersen on 27/10/2015.
-//  Copyright © 2015 twoFly. All rights reserved.
 //
 
 class TMXParser: NSObject {
@@ -81,11 +71,14 @@ class TMXParser: NSObject {
     /// An array of object groups
     lazy var objectGroups = [TMXObjectGroup]()
     
+    /// An array of image layers
+    lazy var imageLayers = [TMXImageLayer]()
+    
     
     // MARK: Private properties for handling internal state
     
     fileprivate enum ParsingElementType: Int {
-        case invalid, none, map, layer, data, objectGroup, object, polygon, polyline, property, animation, frame
+        case invalid, none, map, layer, data, objectGroup, object, polygon, polyline, property, animation, frame, imageLayer, image
         
         init(type: String) {
             switch type.lowercased() {
@@ -105,10 +98,14 @@ class TMXParser: NSObject {
                 self = .polyline
             case "property":
                 self = .property
-            case "Animation":
+            case "animation":
                 self = .animation
-            case "Frame":
+            case "frame":
                 self = .frame
+            case "imagelayer":
+                self = .imageLayer
+            case "image":
+                self = .image
             default:
                 self = .invalid
             }
@@ -150,7 +147,7 @@ class TMXParser: NSObject {
             parser.shouldResolveExternalEntities = false
             
             if !parser.parse() {
-                fatalError("Error parsing data, error: \(parser.parserError)")
+                fatalError("Error parsing data, error: \(String(describing: parser.parserError))")
             }
             
         } catch let error as NSError {
@@ -346,7 +343,7 @@ class TMXParser: NSObject {
                 x: CGFloat(Int(x)!),
                 y: size.height - CGFloat(Int(y)!)
             )
-            object.position.y += object.size.height * 0.5
+            object.position.y -= object.size.height
         }
         
         // A reference to a tile gID
@@ -366,8 +363,6 @@ class TMXParser: NSObject {
                 object.visible = false
             }
         }
-        
-        // print("Object: \(object.name) - pos: \(object.position) - size: \(object.size)")
         
         // Add the object to the object group
         group.objects.append(object)
@@ -427,12 +422,91 @@ class TMXParser: NSObject {
                 }
                 object.properties[key] = value
                 
+            case .imageLayer:
+                // Add property to image layer
+                guard let layer = parsingObject() else {
+                    fatalError("Error parsing image layer property. There are no image layers to associate the property with!")
+                }
+                layer.properties[key] = value
+                
             default:
                 print("Parsing of property for element not yet implememted.")
-                
-                break
             }
             
+        }
+        
+    }
+    
+    
+    // MARK: Parse ImageLayer element
+    fileprivate func parseImageLayerElement(_ attributeDict: [String : String]) {
+        
+        // Create a new object group
+        let layer = TMXImageLayer(parser: self)
+        
+        // Name of image layer
+        if let name = attributeDict["name"] {
+            layer.name = name
+        }
+        
+        // Visibility of image layer
+        if let visible = attributeDict["visible"] {
+            layer.visible = visible != "0"
+        }
+        
+        // The horizontal offset of the image layer
+        if let offsetX = attributeDict["offsetx"] {
+            layer.offsetX = CGFloat(Int(offsetX)!)
+        }
+        
+        // The vertical offset of the image layer
+        if let offsetY = attributeDict["offsety"] {
+            layer.offsetY = CGFloat(Int(offsetY)!)
+        }
+        
+        // The opacity of the image layer
+        if let opacity = attributeDict["opacity"] {
+            layer.opacity = CGFloat(Double(opacity)!)
+        }
+        
+        // Add the object group to the objectGroups array
+        imageLayers.append(layer)
+        
+    }
+    
+    
+    // MARK: Parse Image element
+    fileprivate func parseImageElement(_ attributeDict: [String : String]) {
+        
+        let image = TMXImage()
+        
+        // The source of the image
+        if let source = attributeDict["source"] {
+            image.source = source
+        }
+        
+        // The width of the image
+        if let width = attributeDict["width"] {
+            image.width = CGFloat(Int(width)!)
+        }
+        
+        // The height of the image
+        if let height = attributeDict["height"] {
+            image.height = CGFloat(Int(height)!)
+        }
+        
+        // Assign image to the object being parsed
+        switch parsingElement {
+        case .imageLayer:
+            // Add image to image layer element
+            guard let layer = imageLayers.last else {
+                fatalError("Error parsing image data. There are no image layers to associate the image with!")
+            }
+            
+            layer.image = image
+            
+        default:
+            print("Parsing of image for element not yet implememted.")
         }
         
     }
@@ -525,6 +599,13 @@ extension TMXParser: XMLParserDelegate {
             parseLayerElement(attributeDict)
             parsingElement = .layer
             
+        case .imageLayer:
+            parseImageLayerElement(attributeDict)
+            parsingElement = .imageLayer
+            
+        case .image:
+            parseImageElement(attributeDict)
+            
         case .data:
             parseDataElement(attributeDict)
             
@@ -556,7 +637,7 @@ extension TMXParser: XMLParserDelegate {
                 parseCSVEncodedTileDataString()
             }
             
-        case .layer, .map, .object, .objectGroup:
+        case .layer, .map, .object, .objectGroup, .imageLayer:
             parsingElement = .none
             
         default:
@@ -736,5 +817,58 @@ class TMXObject {
     init(group: TMXObjectGroup) {
         self.group = group
     }
+    
+}
+
+
+
+// MARK: - TMXImageLayer
+class TMXImageLayer {
+    
+    /// A reference to the TMXParser this object group belongs to
+    unowned let parser: TMXParser
+    
+    /// The name of the layer
+    var name = ""
+    
+    /// The visibility of the layer
+    var visible = true
+    
+    /// The horizontal offset of the layer
+    var offsetX: CGFloat = 0
+    
+    /// The vertical offset of the layer
+    var offsetY: CGFloat = 0
+    
+    /// The opacity of the layer
+    var opacity: CGFloat = 1
+    
+    /// The image for this layer
+    var image: TMXImage?
+    
+    /// Image layer properties
+    lazy var properties = [String : String]()
+    
+    /// Initializer
+    init(parser: TMXParser) {
+        // Set a reference to the parser
+        self.parser = parser
+    }
+    
+}
+
+
+
+// MARK: - TMXImage
+class TMXImage {
+    
+    /// The source of the image
+    var source: String = ""
+    
+    /// The width of the image
+    var width: CGFloat = 0
+    
+    /// The height of the image
+    var height: CGFloat = 0
     
 }
