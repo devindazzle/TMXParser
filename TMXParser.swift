@@ -1,7 +1,7 @@
 import UIKit
 
 //
-//  Created by Kim Pedersen on 15/10/2017.
+//  Created by Kim Pedersen on 27/10/2015.
 //  Copyright © 2015 twoFly. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -193,9 +193,9 @@ class TMXParser: NSObject {
             let start = hexString.index(hexString.startIndex, offsetBy: 1)
             let hexColor = String(hexString[start...])
             let scanner = Scanner(string: hexColor)
-            var hexNumber: UInt32 = 0
+            var hexNumber: UInt64 = 0
             
-            if scanner.scanHexInt32(&hexNumber) {
+            if scanner.scanHexInt64(&hexNumber) {
                 if hexColor.count == 8 {
                     let a = CGFloat((hexNumber & 0xff000000) >> 24) / 255
                     let r = CGFloat((hexNumber & 0x00ff0000) >> 16) / 255
@@ -450,7 +450,7 @@ class TMXParser: NSObject {
                 
             case .imageLayer:
                 // Add property to image layer
-                guard let layer = parsingObject() else {
+                guard let layer = imageLayers.last else {
                     fatalError("Error parsing image layer property. There are no image layers to associate the property with!")
                 }
                 layer.properties[key] = value
